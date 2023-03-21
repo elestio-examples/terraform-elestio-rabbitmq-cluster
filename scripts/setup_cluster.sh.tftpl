@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Write ssh key in a temporary file (deleted later in the script)
+filename="tmp_private_key.txt"
+echo "${ssh_private_key}" > $${filename}
+chmod -R 600 $${filename}
+
+# Stop the children nodes before the main one.
+%{ for index, node in nodes ~}
+%{ if index != 0 }
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${node.ipv4} <<'EOF'
+cd /opt/app
+docker-compose down
+EOF
+%{ endif }
+%{ endfor ~}
+
+# Stop the main node, apply new configuration and restart it.
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${nodes[0].ipv4} <<'EOF'
+cd /opt/app
+docker-compose down
+echo "${erlang_cookie}" > ./data/.erlang.cookie
+sed -i '/# cluster_config_start/,/# cluster_config_end/d' docker-compose.yml
+sed -i 's/restart: always/&\n    # cluster_config_start\n    extra_hosts:\n      - "${join("\"\\n      - \"", [for n in nodes : format("%s:%s", n.server_name, n.global_ip)])}"\n    hostname: ${nodes[0].server_name}\n    # cluster_config_end/' docker-compose.yml
+docker-compose up -d
+sleep 15
+EOF
+
+# Apply new configuration to child nodes and start them up.
+# Additionally, the new nodes are reset and join the cluster.
+%{ for index, node in nodes ~}
+%{ if index != 0 }
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${node.ipv4} <<'EOF'
+cd /opt/app
+echo "${erlang_cookie}" > ./data/.erlang.cookie
+
+isNewNode${index}=false
+if ! grep -q "# cluster_config_start" docker-compose.yml; then
+  isNewNode${index}=true
+fi
+
+sed -i "/# cluster_config_start/,/# cluster_config_end/d" docker-compose.yml
+sed -i 's/restart: always/&\n    # cluster_config_start\n    extra_hosts:\n      - "${join("\"\\n      - \"", [for n in nodes : format("%s:%s", n.server_name, n.global_ip)])}"\n    hostname: ${node.server_name}\n    # cluster_config_end/' docker-compose.yml
+docker-compose up -d
+sleep 15
+
+if [ $${isNewNode${index}} == true ]; then
+docker exec -i rabbitmq rabbitmqctl stop_app
+docker exec -i rabbitmq rabbitmqctl reset
+docker exec -i rabbitmq rabbitmqctl join_cluster --ram rabbit@${nodes[0].server_name}
+docker exec -i rabbitmq rabbitmqctl start_app
+fi
+EOF
+%{ endif }
+%{ endfor ~}
+
+# Delete temporary ssh key file
+rm $${filename}
