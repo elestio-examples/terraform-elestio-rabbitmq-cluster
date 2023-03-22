@@ -45,9 +45,8 @@ variable "ssh_key" {
 variable "erlang_cookie" {
   type        = string
   description = <<-EOT
-    Any private and secure string.
+    A string of alphanumeric characters that is used for communication between nodes in a RabbitMQ cluster.
     The same value will be applied in environment variable `RABBITMQ_ERLANG_COOKIE` on all instances.
-    This is a condition to link RabbitMQ instances in a cluster.
   EOT
   sensitive   = true
 }

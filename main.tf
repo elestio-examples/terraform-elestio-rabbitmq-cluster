@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    elestio = {
-      source  = "elestio/elestio"
-      version = ">= 0.7.1"
-    }
-  }
-}
-
 resource "elestio_rabbitmq" "nodes" {
   count         = var.nodes_count
   project_id    = var.project_id
