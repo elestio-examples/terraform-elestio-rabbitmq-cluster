@@ -49,4 +49,5 @@ variable "erlang_cookie" {
     The same value will be applied in environment variable `RABBITMQ_ERLANG_COOKIE` on all instances.
     This is a condition to link RabbitMQ instances in a cluster.
   EOT
+  sensitive   = true
 }

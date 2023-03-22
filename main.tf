@@ -42,7 +42,7 @@ resource "elestio_rabbitmq" "nodes" {
 resource "null_resource" "cluster_configuration" {
   # Changes to any instance of the cluster requires re-provisioning
   triggers = {
-    cluster_instance_ids = join(",", elestio_rabbitmq.nodes.*.id)
+    require_replace = join(",", concat([var.erlang_cookie], elestio_rabbitmq.nodes.*.id))
   }
 
   provisioner "local-exec" {
