@@ -20,7 +20,7 @@ Copy and paste into your Terraform configuration:
 # main.tf
 
 module "rabbitmq-cluster" {
-  source        = "elestio-examples/terraform_elestio_rabbitmq_cluster/elestio"
+  source        = "elestio-examples/rabbitmq-cluster/elestio"
   nodes_count   = 3
   project_id    = var.project_id
   erlang_cookie = var.erlang_cookie
