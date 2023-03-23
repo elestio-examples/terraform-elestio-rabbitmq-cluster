@@ -1,6 +1,6 @@
 # main.tf
 
-module "rabbitmq_cluster" {
+module "rabbitmq-cluster" {
   source        = "elestio-examples/terraform_elestio_rabbitmq_cluster/elestio"
   nodes_count   = 3
   project_id    = var.project_id
