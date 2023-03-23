@@ -1,23 +1,29 @@
-# Elestio RabbitMQ Cluster
+# Terraform module to create a simple RabbitMQ cluster on Elestio
 
-This module allows you to deploy in a few minutes a Elestio RabbitMQ cluster with linked nodes.
+Using this module, you can easily and quickly deploy a **RabbitMQ Cluster** on **Elestio** that is configured correctly and **ready to use**, without spending a lot of time on manual configuration.
 
-Choose the number of nodes you want and let terraform take care of the rest. Save a lot of time.
+## What it does ?
+
+1. Uses [official](https://hub.docker.com/_/rabbitmq/) RabbitMQ docker image.
+2. Creates `N` nodes.
+3. Makes sure nodes can talk to each other and create the cluster.
+4. Makes sure that new nodes always join the cluster.
 
 <!-- BEGIN_TF_DOCS -->
 
 
-## Example
+## How to use it ?
 
-Create a working RabbitMQ cluster with 3 nodes
+Copy and paste into your Terraform configuration:
 
 ```hcl
-module "terraform_elestio_rabbitmq_cluster" {
-  source = "elestio/terraform_elestio_rabbitmq_cluster/elestio"
+# main.tf
 
+module "rabbitmq_cluster" {
+  source        = "elestio-examples/terraform_elestio_rabbitmq_cluster/elestio"
   nodes_count   = 3
-  project_id    = "<your-project-id>"
-  erlang_cookie = "<your-secret-string>"
+  project_id    = var.project_id
+  erlang_cookie = var.erlang_cookie
   config = {
     server_name   = "rabbitmq-example"
     server_type   = "SMALL-1C-2G"
@@ -25,15 +31,41 @@ module "terraform_elestio_rabbitmq_cluster" {
     datacenter    = "fsn1"
     version       = "3-management"
     support_level = "level1"
-    admin_email   = "<your-email>"
+    admin_email   = var.admin_email
   }
   ssh_key = {
-    key_name    = "ssh_key_example"
-    public_key  = file("/Users/[...]/.ssh/id_rsa.pub")
-    private_key = file("/Users/[...]/.ssh/id_rsa")
+    key_name    = var.ssh_key_name
+    public_key  = var.ssh_public_key
+    private_key = var.ssh_private_key
   }
 }
 ```
+
+Customize the variables in a `*.tfvars` file:
+```hcl
+# secrets.tfvars
+
+project_id = "2500"
+erlang_cookie = "SecureAndSecretString"
+admin_email = "admin@email.com"
+ssh_key_name = "Admin"
+ssh_public_key = file("~/.ssh/id_rsa.pub")
+ssh_private_key = file("~/.ssh/id_rsa")
+```
+
+Then run :
+1. `terraform init`
+2. `terraform plan -var-file="secrets.tfvars"`
+3. `terraform apply -var-file="secrets.tfvars"`
+
+## Scale the nodes
+
+If 3 nodes are no longer enough, modify `nodes_count` to 5 in the configuration and run `terraform apply` again.
+This will add 2 more nodes to the cluster.
+
+You can also reduce the number of nodes, the excess ones will leave the cluster cleanly at the next `terraform apply`.
+
+Changing the number of nodes or the erlang cookie requires a reboot of all nodes.</br>Note that your services may be down for a few minutes (max 3mn).
 
 
 ## Inputs

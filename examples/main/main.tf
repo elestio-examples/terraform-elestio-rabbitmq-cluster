@@ -1,9 +1,10 @@
-module "terraform_elestio_rabbitmq_cluster" {
-  source = "elestio/terraform_elestio_rabbitmq_cluster/elestio"
+# main.tf
 
+module "rabbitmq_cluster" {
+  source        = "elestio-examples/terraform_elestio_rabbitmq_cluster/elestio"
   nodes_count   = 3
-  project_id    = "<your-project-id>"
-  erlang_cookie = "<your-secret-string>"
+  project_id    = var.project_id
+  erlang_cookie = var.erlang_cookie
   config = {
     server_name   = "rabbitmq-example"
     server_type   = "SMALL-1C-2G"
@@ -11,11 +12,11 @@ module "terraform_elestio_rabbitmq_cluster" {
     datacenter    = "fsn1"
     version       = "3-management"
     support_level = "level1"
-    admin_email   = "<your-email>"
+    admin_email   = var.admin_email
   }
   ssh_key = {
-    key_name    = "ssh_key_example"
-    public_key  = file("/Users/[...]/.ssh/id_rsa.pub")
-    private_key = file("/Users/[...]/.ssh/id_rsa")
+    key_name    = var.ssh_key_name
+    public_key  = var.ssh_public_key
+    private_key = var.ssh_private_key
   }
 }

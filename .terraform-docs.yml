@@ -16,13 +16,32 @@ sections:
 content: |-
   {{ .Header }}
 
-  ## Example
+  ## How to use it ?
 
-  Create a working RabbitMQ cluster with 3 nodes
+  Copy and paste into your Terraform configuration:
 
   ```hcl
   {{ include "examples/main/main.tf" }}
   ```
+
+  Customize the variables in a `*.tfvars` file:
+  ```hcl
+  {{ include "examples/main/secrets.tfvars" }}
+  ```
+
+  Then run :
+  1. `terraform init`
+  2. `terraform plan -var-file="secrets.tfvars"`
+  3. `terraform apply -var-file="secrets.tfvars"`
+
+  ## Scale the nodes
+
+  If 3 nodes are no longer enough, modify `nodes_count` to 5 in the configuration and run `terraform apply` again.
+  This will add 2 more nodes to the cluster.
+
+  You can also reduce the number of nodes, the excess ones will leave the cluster cleanly at the next `terraform apply`.
+
+  Changing the number of nodes or the erlang cookie requires a reboot of all nodes.</br>Note that your services may be down for a few minutes (max 3mn).
 
   {{ .Footer }}
   {{ .Inputs }}
