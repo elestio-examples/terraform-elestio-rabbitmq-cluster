@@ -248,20 +248,20 @@ No modules.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_elestio"></a> [elestio](#provider\_elestio) | = 0.13.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | = 3.2.0 |
+| <a name="provider_elestio"></a> [elestio](#provider\_elestio) | >= 0.14.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.2.0 |
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_elestio"></a> [elestio](#requirement\_elestio) | = 0.13.0 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | = 3.2.0 |
+| <a name="requirement_elestio"></a> [elestio](#requirement\_elestio) | >= 0.14.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [elestio_rabbitmq.nodes](https://registry.terraform.io/providers/elestio/elestio/0.13.0/docs/resources/rabbitmq) | resource |
-| [null_resource.cluster_configuration](https://registry.terraform.io/providers/hashicorp/null/3.2.0/docs/resources/resource) | resource |
-| [null_resource.ensure_child_node_leaves_cluster_nicely](https://registry.terraform.io/providers/hashicorp/null/3.2.0/docs/resources/resource) | resource |
+| [elestio_rabbitmq.nodes](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/rabbitmq) | resource |
+| [null_resource.cluster_configuration](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.ensure_child_node_leaves_cluster_nicely](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 <!-- END_TF_DOCS -->
