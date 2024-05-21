@@ -79,7 +79,7 @@ variable "nodes" {
   default     = []
   description = <<-EOF
     Each element of this list will create an Elestio RabbitMQ Resource in your cluster.
-    Read the following documentation to understand what each attribute does, plus the default values: [Elestio KeyDB Resource](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/rabbitmq).
+    Read the following documentation to understand what each attribute does, plus the default values: [Elestio RabbitMQ Resource](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/rabbitmq).
   EOF
   validation {
     error_message = "You must provide at least one node."

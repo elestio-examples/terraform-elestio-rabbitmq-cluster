@@ -20,6 +20,8 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} 
 cd /opt/app
 docker-compose down
 echo "${erlang_cookie}" > ./data/.erlang.cookie
+chmod 400 ./data/.erlang.cookie
+sed -i '/hostname: rabbitmq/d' docker-compose.yml
 sed -i '/# cluster_config_start/,/# cluster_config_end/d' docker-compose.yml
 sed -i 's/restart: always/&\n    # cluster_config_start\n    extra_hosts:\n      - "${join("\"\\n      - \"", [for n in nodes : format("%s:%s", n.server_name, n.global_ip)])}"\n    hostname: ${nodes[0].server_name}\n    # cluster_config_end/' docker-compose.yml
 docker-compose up -d
@@ -33,22 +35,24 @@ EOF
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $${filename} root@${node.ipv4} <<'EOF'
 cd /opt/app
 echo "${erlang_cookie}" > ./data/.erlang.cookie
+chmod 400 ./data/.erlang.cookie
 
 isNewNode${index}=false
 if ! grep -q "# cluster_config_start" docker-compose.yml; then
   isNewNode${index}=true
 fi
 
+sed -i '/hostname: rabbitmq/d' docker-compose.yml
 sed -i "/# cluster_config_start/,/# cluster_config_end/d" docker-compose.yml
 sed -i 's/restart: always/&\n    # cluster_config_start\n    extra_hosts:\n      - "${join("\"\\n      - \"", [for n in nodes : format("%s:%s", n.server_name, n.global_ip)])}"\n    hostname: ${node.server_name}\n    # cluster_config_end/' docker-compose.yml
 docker-compose up -d
 
 if [ $${isNewNode${index}} == true ]; then
 sleep 10
-docker exec -i rabbitmq rabbitmqctl stop_app
-docker exec -i rabbitmq rabbitmqctl reset
-docker exec -i rabbitmq rabbitmqctl join_cluster --ram rabbit@${nodes[0].server_name}
-docker exec -i rabbitmq rabbitmqctl start_app
+docker-compose exec rabbitmq rabbitmqctl stop_app
+docker-compose exec rabbitmq rabbitmqctl reset
+docker-compose exec rabbitmq rabbitmqctl join_cluster --ram rabbit@${nodes[0].server_name}
+docker-compose exec rabbitmq rabbitmqctl start_app
 fi
 EOF
 %{ endif }

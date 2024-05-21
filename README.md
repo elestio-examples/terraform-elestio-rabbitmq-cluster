@@ -107,15 +107,15 @@ module "cluster" {
   nodes = [
     {
       server_name   = "rabbitmq-1"
-      provider_name = "scaleway"
-      datacenter    = "fr-par-1"
-      server_type   = "SMALL-2C-2G"
+      provider_name = "hetzner"
+      datacenter    = "fsn1"
+      server_type   = "SMALL-1C-2G"
     },
     {
       server_name   = "rabbitmq-2"
-      provider_name = "scaleway"
-      datacenter    = "fr-par-2"
-      server_type   = "SMALL-2C-2G"
+      provider_name = "hetzner"
+      datacenter    = "fsn1"
+      server_type   = "SMALL-1C-2G"
     },
   ]
 }
@@ -167,9 +167,9 @@ If you want the load balancer to be managed by Elestio, add the following code t
 ```hcl
 resource "elestio_load_balancer" "load_balancer" {
   project_id    = elestio_project.project.id
-  provider_name = "scaleway"
-  datacenter    = "fr-par-1"
-  server_type   = "SMALL-2C-2G"
+  provider_name = "hetzner"
+  datacenter    = "fsn1"
+  server_type   = "SMALL-1C-2G"
   config = {
     target_services = [for node in module.cluster.nodes : node.id]
     forward_rules = [
@@ -232,7 +232,7 @@ amqp.connect(
 |------|-------------|------|---------|:--------:|
 | <a name="input_configuration_ssh_key"></a> [configuration\_ssh\_key](#input\_configuration\_ssh\_key) | After the nodes are created, Terraform must connect to apply some custom configuration.<br>This configuration is done using SSH from your local machine.<br>The Public Key will be added to the nodes and the Private Key will be used by your local machine to connect to the nodes.<br><br>Read the guide [\"How generate a valid SSH Key for Elestio\"](https://registry.terraform.io/providers/elestio/elestio/latest/docs/guides/ssh_keys). Example:<pre>configuration_ssh_key = {<br>  username = "admin"<br>  public_key = chomp(file("\~/.ssh/id_rsa.pub"))<br>  private_key = file("\~/.ssh/id_rsa")<br>}</pre> | <pre>object({<br>    username    = string<br>    public_key  = string<br>    private_key = string<br>  })</pre> | n/a | yes |
 | <a name="input_erlang_cookie"></a> [erlang\_cookie](#input\_erlang\_cookie) | A string of alphanumeric characters that is used for communication between nodes in a RabbitMQ cluster.<br>The same value will be applied on all instances. | `string` | n/a | yes |
-| <a name="input_nodes"></a> [nodes](#input\_nodes) | Each element of this list will create an Elestio RabbitMQ Resource in your cluster.<br>Read the following documentation to understand what each attribute does, plus the default values: [Elestio KeyDB Resource](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/rabbitmq). | <pre>list(<br>    object({<br>      server_name                                       = string<br>      provider_name                                     = string<br>      datacenter                                        = string<br>      server_type                                       = string<br>      admin_email                                       = optional(string)<br>      alerts_enabled                                    = optional(bool)<br>      app_auto_update_enabled                           = optional(bool)<br>      backups_enabled                                   = optional(bool)<br>      custom_domain_names                               = optional(set(string))<br>      firewall_enabled                                  = optional(bool)<br>      keep_backups_on_delete_enabled                    = optional(bool)<br>      remote_backups_enabled                            = optional(bool)<br>      support_level                                     = optional(string)<br>      system_auto_updates_security_patches_only_enabled = optional(bool)<br>      ssh_public_keys = optional(list(<br>        object({<br>          username = string<br>          key_data = string<br>        })<br>      ), [])<br>    })<br>  )</pre> | `[]` | no |
+| <a name="input_nodes"></a> [nodes](#input\_nodes) | Each element of this list will create an Elestio RabbitMQ Resource in your cluster.<br>Read the following documentation to understand what each attribute does, plus the default values: [Elestio RabbitMQ Resource](https://registry.terraform.io/providers/elestio/elestio/latest/docs/resources/rabbitmq). | <pre>list(<br>    object({<br>      server_name                                       = string<br>      provider_name                                     = string<br>      datacenter                                        = string<br>      server_type                                       = string<br>      admin_email                                       = optional(string)<br>      alerts_enabled                                    = optional(bool)<br>      app_auto_update_enabled                           = optional(bool)<br>      backups_enabled                                   = optional(bool)<br>      custom_domain_names                               = optional(set(string))<br>      firewall_enabled                                  = optional(bool)<br>      keep_backups_on_delete_enabled                    = optional(bool)<br>      remote_backups_enabled                            = optional(bool)<br>      support_level                                     = optional(string)<br>      system_auto_updates_security_patches_only_enabled = optional(bool)<br>      ssh_public_keys = optional(list(<br>        object({<br>          username = string<br>          key_data = string<br>        })<br>      ), [])<br>    })<br>  )</pre> | `[]` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | n/a | `string` | n/a | yes |
 | <a name="input_rabbitmq_pass"></a> [rabbitmq\_pass](#input\_rabbitmq\_pass) | Require at least 10 characters, one uppercase letter, one lowercase letter and one number.<br>Generate a random valid password: https://api.elest.io/api/auth/passwordgenerator | `string` | n/a | yes |
 | <a name="input_rabbitmq_version"></a> [rabbitmq\_version](#input\_rabbitmq\_version) | The cluster nodes must share the same rabbitmq version.<br>Leave empty or set to `null` to use the Elestio recommended version. | `string` | `null` | no |

@@ -42,10 +42,11 @@ resource "null_resource" "ensure_child_node_leaves_cluster_nicely" {
   }
 
   provisioner "remote-exec" {
-    when = destroy
+    when       = destroy
+    on_failure = continue
     inline = [
-      "docker exec -it rabbitmq rabbitmqctl stop_app",
-      "docker exec -it rabbitmq rabbitmqctl reset",
+      "docker-compose exec rabbitmq rabbitmqctl stop_app",
+      "docker-compose exec rabbitmq rabbitmqctl reset",
     ]
   }
 }
